@@ -73,7 +73,11 @@ const exchangeCoreS = async (privateKey, index) => {
 const main = async () => {
     for(let i =0; i < coreWallets.length-1; i++) {
         const item = coreWallets[i]
-        await exchangeCoreS(item, i)
+        try {
+            await exchangeCoreS(item, i)
+        } catch(e) {
+            console.log('Error', e)
+        }
     }
 }
 

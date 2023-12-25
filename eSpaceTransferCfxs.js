@@ -70,7 +70,11 @@ const transfer = async (privateKey, index) => {
 const main = async () => {
     for(let i =0; i < wallets.length-1; i++) {
         const item = wallets[i]
-        await transfer(item, i)
+        try {
+            await transfer(item, i)
+        } catch(e) {
+            console.log('Error', e)
+        }
     }
 }
 

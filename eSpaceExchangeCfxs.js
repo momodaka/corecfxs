@@ -59,7 +59,11 @@ const exchange = async (privateKey, index) => {
 const main = async () => {
     for(let i =0; i < wallets.length-1; i++) {
         const item = wallets[i]
-        await exchange(item, i)
+        try {
+            await exchange(item, i)
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 

@@ -71,7 +71,11 @@ const transferCore = async (privateKey, index) => {
 const main = async () => {
     for(let i =0; i < coreWallets.length-1; i++) {
         const item = coreWallets[i]
-        await transferCore(item, i)
+        try {
+            await transferCore(item, i)
+        } catch(e) {
+            console.log(e)
+        }
     }
 }
 
