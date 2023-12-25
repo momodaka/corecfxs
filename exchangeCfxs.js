@@ -1,54 +1,89 @@
-const { exchangeCFXs, account, cfxsContract, cfxsExchangeContract } = require('./conflux');
-const { address } = require('js-conflux-sdk');
+const { exchangeCFXs, cfxsContract, cfxsExchangeContract } = require('./conflux');
+const { Conflux, address } = require('js-conflux-sdk');
 const { waitMilliseconds, getIDs } = require('./utils.js');
-const mappedAddress = address.cfxMappedEVMSpaceAddress(account.address);
+const coreWallets = require('./core-wallets');
+
+
+const conflux = new Conflux({
+    url: 'https://main.confluxrpc.com',
+    networkId: 1029,
+});
 
 const STEP = 5;
 
-async function main() {
-    const ids = await getIDs(mappedAddress);
-    
-    for(let i = 0; i < ids.length; i += STEP) {
-        try {
-            let exIds = [];
-            for(let j = 0; j < STEP; j++) {
-                if (i + j >= ids.length) break;
+const exchangeCoreS = async (privateKey, index) => {
 
-                let id = ids[i + j];
-                if (id === '0') continue;
-                let cfxsId = parseInt(id);
+    const account = conflux.wallet.addPrivateKey(privateKey);
 
-                let minted = await cfxsExchangeContract.minted(cfxsId);
-                if (minted) {
-                    console.log(`Id ${cfxsId} already exchanged`);
-                    await waitMilliseconds(100);
-                    continue;
+    const mappedAddress = address.cfxMappedEVMSpaceAddress(account.address);
+
+    console.log(index, account.address)
+    console.log('espace', mappedAddress)
+
+
+    async function exchange() {
+        const ids = await getIDs(mappedAddress);
+
+        for(let i = 0; i < ids.length; i += STEP) {
+            try {
+                let exIds = [];
+                for(let j = 0; j < STEP; j++) {
+                    if (i + j >= ids.length) break;
+
+                    let id = ids[i + j];
+                    if (id === '0') continue;
+                    let cfxsId = parseInt(id);
+
+                    let minted = await cfxsExchangeContract.minted(cfxsId);
+                    if (minted) {
+                        console.log(`Id ${cfxsId} already exchanged`);
+                        await waitMilliseconds(100);
+                        continue;
+                    }
+
+                    // check owner
+                    let info = await cfxsContract.CFXss(cfxsId);
+                    if(!info || info.length === 0 || info[1] != mappedAddress) {
+                        console.log(`Id ${cfxsId} is not yours`);
+                        await waitMilliseconds(100);
+                        continue;
+                    }
+
+                    exIds.push(cfxsId);
                 }
 
-                // check owner
-                let info = await cfxsContract.CFXss(cfxsId);
-                if(!info || info.length === 0 || info[1] != mappedAddress) {
-                    console.log(`Id ${cfxsId} is not yours`);
-                    await waitMilliseconds(100);
-                    continue;
-                }
+                if (exIds.length === 0) continue;
 
-                exIds.push(cfxsId);
+                console.log(`Exchange cfxs id ${exIds}`);
+                const receipt = await exchangeCFXs(exIds);
+                console.log(`Result: ${receipt.outcomeStatus === 0 ? 'success' : 'fail'}`);
+                console.log('Tx hash', receipt.transactionHash);
+            } catch(e) {
+                console.log('Transfer Error', e);
+                await waitMilliseconds(500);
             }
-            
-            if (exIds.length === 0) continue;
-            
-            console.log(`Exchange cfxs id ${exIds}`);
-            const receipt = await exchangeCFXs(exIds);
-            console.log(`Result: ${receipt.outcomeStatus === 0 ? 'success' : 'fail'}`);
-            console.log('Tx hash', receipt.transactionHash);
-        } catch(e) {
-            console.log('Transfer Error', e);
-            await waitMilliseconds(500);
         }
+
+        console.log('Finished');
     }
 
-    console.log('Finished');
+    await exchange()
 }
 
-main().catch(e => console.error(e));
+const main = async () => {
+    for(let i =0; i < coreWallets.length-1; i++) {
+        const item = coreWallets[i]
+        await exchangeCoreS(item, i)
+    }
+}
+
+main()
+
+
+process
+  .on('unhandledRejection', (reason, p) => {
+      console.error(reason, 'Unhandled Rejection at Promise', p)
+  })
+  .on('uncaughtException', err => {
+      console.error(err, 'Uncaught Exception thrown')
+  })
