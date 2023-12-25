@@ -3,7 +3,7 @@ const { address, Conflux } = require('js-conflux-sdk');
 const { waitMilliseconds, getIDs } = require('./utils.js');
 const coreWallets = require("./core-wallets");
 
-const STEP = 5;
+const STEP = 32;
 
 const conflux = new Conflux({
     url: 'https://main.confluxrpc.com',

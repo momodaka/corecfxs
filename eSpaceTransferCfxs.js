@@ -10,7 +10,7 @@ const provider = new JsonRpcProvider( 'https://evm.confluxrpc.com');
 
 const receiver = '' // 收款账号
 
-const STEP = 5;
+const STEP = 32;
 
 
 const transfer = async (privateKey, index) => {
