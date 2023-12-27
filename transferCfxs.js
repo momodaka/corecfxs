@@ -1,14 +1,9 @@
-const { transferCFXs, cfxsMainContract } = require('./conflux');
+const { conflux, transferCFXs, cfxsMainContract } = require('./conflux');
 const { address, Conflux } = require('js-conflux-sdk');
 const { waitMilliseconds, getIDs } = require('./utils.js');
 const coreWallets = require("./core-wallets");
 
 const STEP = 32;
-
-const conflux = new Conflux({
-    url: 'https://main.confluxrpc.com',
-    networkId: 1029,
-});
 
 const receiver = '' // 收款账号
 
@@ -54,7 +49,7 @@ const transferCore = async (privateKey, index) => {
                 if (exIds.length === 0) continue;
 
                 console.log(`Transfer cfxs id ${exIds} to ${receiver}`);
-                const receipt = await transferCFXs(exIds, receiver);
+                const receipt = await transferCFXs(exIds, receiver, account)
                 console.log(`Result: ${receipt.outcomeStatus === 0 ? 'success' : 'fail'}`);
             } catch(e) {
                 console.log('Transfer Error', e);
@@ -69,7 +64,7 @@ const transferCore = async (privateKey, index) => {
 }
 
 const main = async () => {
-    for(let i =0; i < coreWallets.length-1; i++) {
+    for(let i =0; i <= coreWallets.length-1; i++) {
         const item = coreWallets[i]
         try {
             await transferCore(item, i)

@@ -1,15 +1,10 @@
-const { exchangeCFXs, cfxsContract, cfxsExchangeContract } = require('./conflux');
-const { Conflux, address } = require('js-conflux-sdk');
+const { conflux, exchangeCFXs, cfxsContract, cfxsExchangeContract } = require('./conflux');
+const { Conflux, Drip, address } = require('js-conflux-sdk');
 const { waitMilliseconds, getIDs } = require('./utils.js');
 const coreWallets = require('./core-wallets');
 
 
-const conflux = new Conflux({
-    url: 'https://main.confluxrpc.com',
-    networkId: 1029,
-});
-
-const STEP = 5;
+const STEP = 32;
 
 const exchangeCoreS = async (privateKey, index) => {
 
@@ -20,9 +15,9 @@ const exchangeCoreS = async (privateKey, index) => {
     console.log(index, account.address)
     console.log('espace', mappedAddress)
 
-
     async function exchange() {
         const ids = await getIDs(mappedAddress);
+        console.log(ids.length, 'ids');
 
         for(let i = 0; i < ids.length; i += STEP) {
             try {
@@ -33,6 +28,8 @@ const exchangeCoreS = async (privateKey, index) => {
                     let id = ids[i + j];
                     if (id === '0') continue;
                     let cfxsId = parseInt(id);
+
+                    console.log(cfxsId, 'start check');
 
                     let minted = await cfxsExchangeContract.minted(cfxsId);
                     if (minted) {
@@ -54,8 +51,8 @@ const exchangeCoreS = async (privateKey, index) => {
 
                 if (exIds.length === 0) continue;
 
-                console.log(`Exchange cfxs id ${exIds}`);
-                const receipt = await exchangeCFXs(exIds);
+                console.log(`Exchange cfxs id ${exIds.length} ${exIds}`);
+                const receipt = await exchangeCFXs(exIds, account);
                 console.log(`Result: ${receipt.outcomeStatus === 0 ? 'success' : 'fail'}`);
                 console.log('Tx hash', receipt.transactionHash);
             } catch(e) {
@@ -71,8 +68,9 @@ const exchangeCoreS = async (privateKey, index) => {
 }
 
 const main = async () => {
-    for(let i =0; i < coreWallets.length-1; i++) {
+    for(let i =0; i <= coreWallets.length-1; i++) {
         const item = coreWallets[i]
+
         try {
             await exchangeCoreS(item, i)
         } catch(e) {
