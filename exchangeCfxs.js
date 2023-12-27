@@ -4,7 +4,7 @@ const { waitMilliseconds, getIDs } = require('./utils.js');
 const coreWallets = require('./core-wallets');
 
 
-const STEP = 32;
+const STEP = 5;
 
 const exchangeCoreS = async (privateKey, index) => {
 
