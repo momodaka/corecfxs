@@ -28,16 +28,26 @@ program.command('mappedAddress')
 
 program.command('cfxsBalance')
   .description('Get the cfxs balance of mapped address')
-  .action(async (options) => {
-    const addr = address.cfxMappedEVMSpaceAddress(account.address);
+  .argument('<address>', 'address')
+  .action(async (str) => {
+    if (!str || !str.startsWith('cfx')) {
+      console.log('Please input a valid Conflux Core address');
+      return;
+    }
+    const addr = address.cfxMappedEVMSpaceAddress(str);
     const balance = await cfxsContract.balanceOf(addr);
     console.log(`Balance of ${addr} is ${balance}`);
   });
 
 program.command('newCfxsBalance')
   .description('Get the new cfxs balance of mapped address')
-  .action(async (options) => {
-    const addr = address.cfxMappedEVMSpaceAddress(account.address);
+  .argument('<address>', 'address')
+  .action(async (str) => {
+    if (!str || !str.startsWith('cfx')) {
+      console.log('Please input a valid Conflux Core address');
+      return;
+    }
+    const addr = address.cfxMappedEVMSpaceAddress(str);
     const balance = await cfxsMainContract.balanceOf(addr);
     console.log(`Balance of ${addr} is ${balance}`);
   });
@@ -56,7 +66,7 @@ program.command('newCfxsBalance')
         console.log('Please input a valid eSpace address');
         return;
     }
-    
+
     try {
         const id = parseInt(options.id);
         console.log(`Transfer cfxs id ${id} to ${options.receiver}`);
