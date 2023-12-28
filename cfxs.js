@@ -36,7 +36,7 @@ program.command('cfxsBalance')
     }
     const addr = address.cfxMappedEVMSpaceAddress(str);
     const balance = await cfxsContract.balanceOf(addr);
-    console.log(`Balance of ${addr} is ${balance}`);
+    console.log(`Old contract Balance of ${addr} is ${balance}`);
   });
 
 program.command('newCfxsBalance')
@@ -49,7 +49,7 @@ program.command('newCfxsBalance')
     }
     const addr = address.cfxMappedEVMSpaceAddress(str);
     const balance = await cfxsMainContract.balanceOf(addr);
-    console.log(`Balance of ${addr} is ${balance}`);
+    console.log(`New contract  Balance of ${addr} is ${balance}`);
   });
 
 // only support core account transfer it's mapped address owned CFXs

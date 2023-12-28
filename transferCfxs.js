@@ -67,8 +67,10 @@ const transferCore = async (privateKey, index) => {
 
     if(oldBalance.toString()  * 1 !== newBalance.toString() * 1) {
         console.log('!!!!!!!!!')
-        console.log('balance not equal', account.address, oldBalance.toString(), newBalance.toString())
-        console.log('please check exchange again')
+        console.log('Balance not equal', account.address, oldBalance.toString(), newBalance.toString())
+        console.log('Old contract Balance ',oldBalance.toString())
+        console.log('New contract Balance ',newBalance.toString())
+        console.log('Please check exchange again')
         return
     } else {
         await main()
