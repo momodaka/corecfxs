@@ -1,4 +1,4 @@
-const { conflux, transferCFXs, cfxsMainContract } = require('./conflux');
+const { conflux, transferCFXs, cfxsMainContract, cfxsContract} = require('./conflux');
 const { address, Conflux } = require('js-conflux-sdk');
 const { waitMilliseconds, getIDs } = require('./utils.js');
 const coreWallets = require("./core-wallets");
@@ -60,7 +60,19 @@ const transferCore = async (privateKey, index) => {
         console.log('Done');
     }
 
-    await main()
+
+    const oldBalance = await cfxsContract.balanceOf(mappedAddress);
+
+    const newBalance = await cfxsMainContract.balanceOf(mappedAddress);
+
+    if(oldBalance.toString()  * 1 !== newBalance.toString() * 1) {
+        console.log('!!!!!!!!!')
+        console.log('balance not equal', account.address, oldBalance.toString(), newBalance.toString())
+        console.log('please check exchange again')
+        return
+    } else {
+        await main()
+    }
 }
 
 const main = async () => {
